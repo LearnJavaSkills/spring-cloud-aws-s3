@@ -1,0 +1,40 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.3.3'
+	id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'in.learnjavaskills'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+ext {
+	springCloudAwsVersion = '3.0.0'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	// spring cloud aws BOM(Bill of materials)
+	implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:${springCloudAwsVersion}")
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
+    // AWS launched a high level file transfer utility, called Transfer Manager and a CRT based S3 client.
+    // The starter automatically configures and registers a software.amazon.awssdk.transfer.s3.S3TransferManager bean if the following dependency is added to the project:
+    implementation 'software.amazon.awssdk:s3-transfer-manager'
+	//Transfer Manager works the best with CRT S3 Client. To auto-configure CRT based S3AsyncClient add following dependency to your project:
+	implementation 'software.amazon.awssdk.crt:aws-crt'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
