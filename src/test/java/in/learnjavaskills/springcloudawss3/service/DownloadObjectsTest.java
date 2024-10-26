@@ -19,10 +19,17 @@ class DownloadObjectsTest
 
     private final String destinationPathForDirectory = "src/test/resources";
 
+    private final String csvFileName = "sample-file.csv";
+
     @Test
     void downloadFileUsingS3Client()
     {
         downloadObjects.downloadFileUsingS3Client(bucketName, key, destinationPath);
+    }
+
+    @Test
+    void readFileWithoutDownloadingUsingS3Client() {
+        downloadObjects.readFileUsingS3Client(bucketName, csvFileName);
     }
 
     @Test

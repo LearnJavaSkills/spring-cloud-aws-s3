@@ -4,15 +4,21 @@ import io.awspring.cloud.s3.S3Resource;
 import io.awspring.cloud.s3.S3Template;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.*;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Download file using STemplate, S3Client and S3TransferManager
@@ -45,6 +51,32 @@ public class DownloadObjects
                     .key(key)
                     .build();
             s3Client.getObject(getObjectRequest, Path.of(downloadDestinationPath));
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    /**
+     * Read file from amazon s3 without downloading in local.
+     * @param bucketName
+     * @param key
+     */
+    public void readFileUsingS3Client(String bucketName, String key) {
+        try {
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build();
+
+            ResponseInputStream<GetObjectResponse> responseResponseInputStream = s3Client.getObject(getObjectRequest);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(responseResponseInputStream));
+
+            String line = "";
+            while (Objects.nonNull(line = bufferedReader.readLine())) {
+                // Since the file format is CSV, we'll split each line by commas (,) to access individual columns.
+                String[] split = line.split(",");
+                System.out.println("line: " + Arrays.toString(split));
+            }
         } catch (Exception exception) {
             exception.printStackTrace();
         }
